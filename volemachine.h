@@ -2,10 +2,11 @@
 #define VOLE_MACHINE_VOLEMACHINE_H
 
 #include <iostream>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
+////////////////////////////////////////////////////////////////////
 class Register{
 
 private:
@@ -16,9 +17,12 @@ public:
     Register() : registers(16, "00"){}
     void setRegister(int , string);
     void Clear (int);
+    void print();
 
 };
 
+
+/////////////////////////////////////////////////////////////////////
 class Memory{
 
 private:
@@ -27,36 +31,44 @@ private:
 public:
     Memory() : Mem(256, "00"){}
     void setMemory(int, string);
+    vector<string> &getMemory();
     void ClearAll ();
     void ClearCell(int);
-    void print(){
-
-        for (const auto & i : Mem) {
-            cout << i << endl;
-        }
-    }
-
+    void print();
 
 };
 
+
+//////////////////////////////////////////////////////////////////////////
 class Instructions{
 
 private:
-    vector <string> Instruction;
+    vector <string> instruction;
 
 public:
-//    ReadFromFile();
-//    Decode();
+    Instructions() : instruction(128){}
+    void setInstruction(int, string);
+    vector<string> &getInstruction();
+    string  Decode();
 
 };
 
+
+//////////////////////////////////////////////////////////////
 class Machine{
-    Machine();
-    string getNextInstruction();
-    void RunInstruction();
-    void DisplayMemory();
-    void DisplayRegister();
 
+private:
+    Register Processor;
+    Memory Storage;
+    Instructions Input;
+
+public:
+    string getNextInstruction(); // increment 2
+    void ReadFromFile(ifstream &inputFile); // DONE
+    void RunInstruction(); // current and next
+    void DisplayMemory(); // DONE
+    void DisplayRegister(); // DONE
 };
+
 
 #endif //VOLE_MACHINE_VOLEMACHINE_H
