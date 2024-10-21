@@ -51,7 +51,6 @@ public:
     Instructions() : instruction(128){}
     void setInstruction(int, string);
     vector<string> &getInstruction();
-    string  Decode();
 
 };
 
