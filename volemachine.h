@@ -16,6 +16,7 @@ public:
 
     Register() : registers(16, "00"){}
     void setRegister(int , string);
+    string getFromRegister(int);
     void Clear (int);
     void print();
 
@@ -31,7 +32,8 @@ private:
 public:
     Memory() : Mem(256, "00"){}
     void setMemory(int, string);
-    vector<string> &getMemory();
+    vector<string> &getAllMemory();
+    string getMemoryCell(int);
     void ClearAll ();
     void ClearCell(int);
     void print();
@@ -61,9 +63,9 @@ private:
     Register Processor;
     Memory Storage;
     Instructions Input;
-
+    vector <string> *programCounter;
 public:
-    string getNextInstruction(); // increment 2
+    void getNextInstruction(); // increment 2
     void ReadFromFile(ifstream &inputFile); // DONE
     void RunInstruction(); // current and next
     void DisplayMemory(); // DONE

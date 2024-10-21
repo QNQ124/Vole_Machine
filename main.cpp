@@ -16,5 +16,7 @@ int main(){
     o.RunInstruction();
     cout << "\n\n\n\n\n";
     o.DisplayMemory();
+    cout << "\n\n\n\n\n";
+    o.DisplayRegister();
 
 }
