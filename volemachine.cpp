@@ -4,6 +4,106 @@
 using namespace std;
 
 
+int Machine::index = 0;
+
+// Convert a hexadecimal string to a binary string (8 bits)
+string hexToBin(const string& hexa) {
+    stringstream ss;
+    ss << hex << hexa;
+    unsigned n;
+    ss >> n;
+    bitset<8> b(n);  // 8-bit to limit to 8 bits
+    return b.to_string();
+}
+
+string dec_to_hex(int num) {
+    string result = "";
+    string hex_chars = "0123456789ABCDEF";
+    while (num >= 1) {
+        result = hex_chars[num % 16] + result;
+        num /= 16;
+    }
+    return result;
+}
+
+int bin_to_dec(string num) {
+    int strlen = num.length();
+    int result = 0;
+    for (int i = 0; i < strlen; i++) {
+        result += (pow(2, (strlen - (1 + i))) * (num[i] - '0'));
+    }
+    return result;
+}
+
+string decFract_to_hex(float fract)
+{
+    string result = "";
+    for (int i = 0; i < 4; ++i) {
+        int floor = 0;
+        fract *=2;
+        floor = fract;
+        if(floor == 1)
+        {
+            result += '1';
+        }else { result += '0'; }
+    }
+    int decTohex = bin_to_dec(result);
+
+    return dec_to_hex(decTohex);
+}
+
+
+float binFract_to_dec(string fract)
+{
+    int strlen = fract.length();
+    float result = 0;
+    for (int i = 0; i < strlen; i++) {
+        result += (pow(2, (-(1 + i))) * (fract[i] - '0'));
+    }
+    return result;
+}
+
+float floatTodecimal(string hexa1)
+{
+    string bin = hexToBin(hexa1);
+    char sign_c = bin[0];
+    int sign = 1;
+    if(sign_c == '1')
+    { sign = -1; }
+
+    string expo = bin.substr(1,3);
+    string fraction = bin.substr(4,4);
+
+    int exp = bin_to_dec(expo);
+    float fract = binFract_to_dec(fraction);
+
+    if(exp == 0)
+    {
+        return (sign * (pow(2,1-3)) * fract);
+
+    }else
+    {
+        fract+=1;
+        return (sign * (pow(2,exp-3)) * fract);
+
+    }
+}
+
+
+string addTwoFloat(string hexa1, string hexa2){ //
+
+    float sum;
+    sum = floatTodecimal(hexa1) + floatTodecimal(hexa2);
+    int expo = sum;
+    float fraction = (sum - expo)/expo;
+    expo = log2(expo) + 3;
+    if(sum < 0)
+    {expo + 8; }
+    string result = dec_to_hex(expo) + decFract_to_hex(fraction);
+    return result;
+
+}
+
 // Function to convert hexadecimal to decimal
 int hexTodec(string num) {
     int strlen = num.length();
@@ -27,16 +127,6 @@ int hexTodec(char hexChar) {
         return hexChar - 'a' + 10; // Convert character 'a'-'f' to integer 10-15
     }
     return 0;
-}
-
-// Convert a hexadecimal string to a binary string (8 bits)
-string hexToBin(const string& hexa) {
-    stringstream ss;
-    ss << hex << hexa;
-    unsigned n;
-    ss >> n;
-    bitset<8> b(n);  // 8-bit to limit to 8 bits
-    return b.to_string();
 }
 
 // Convert a binary string to a hexadecimal string (8 bits)
@@ -104,7 +194,6 @@ void Register::print(){
     }
 }
 
-
 //////////////////////////////////////////////////////////////////////
 void Memory::ClearAll() {
 
@@ -155,6 +244,11 @@ vector<string> &Instructions::getInstruction(){
     return instruction;
 }
 
+string Instructions::getCurrentInstruction(int Index) {
+
+    return instruction[(Index / 2) - 1];
+}
+
 //////////////////////////////////////////////////////////////////////
 void Machine::DisplayMemory() {
 
@@ -166,10 +260,19 @@ void Machine::DisplayRegister() {
     Processor.print();
 }
 
+string Machine::getIR() {
+
+    return Input.getCurrentInstruction(index);
+}
+
+void Machine::getPC() {
+
+    cout << "0X" << dec_to_hex(index) << endl;
+}
+
 void Machine::RunInstruction() {
 
     vector <string> input = Input.getInstruction();
-
 
     int counter = 0;
     for (int i = 0; i < 128; i++) {
@@ -187,23 +290,24 @@ void Machine::RunInstruction() {
          counter++;
     }
 
-    vector <string> data = Storage.getAllMemory();
-
-    programCounter = &data;
-
-    Machine::getNextInstruction();
-
 }
 
+void Machine::DisplayScreen(){
 
-void Machine::getNextInstruction() {
+    cout << "The output screen from (3R00): " << Storage.getMemoryCell(0) << endl;
+}
+bool Machine::getNextInstruction() {
 
     string dataToRegister;
 
-    static int index = 0;
     int counter = 0;
 
-    while(true) {
+    bool stop = false;
+
+    programCounter = &Storage.getAllMemory();
+
+
+    while(!stop) {
 
         char operation = (*programCounter)[index][0];
 
@@ -224,8 +328,14 @@ void Machine::getNextInstruction() {
             string dataFromRegister = Processor.getFromRegister(indexRegister);
             index++;
             int indexOfMemory = hexTodec((*programCounter)[index]);
+            if(indexOfMemory == 0) {
+                Storage.setMemory(indexOfMemory, dataFromRegister);
+                cout << "\n-----------------------\n";
+                DisplayScreen();
+                cout << "-------------------------\n";
+            }
             Storage.setMemory(indexOfMemory, dataFromRegister);
-//
+
         }
        if(operation == '4'){
            index++;
@@ -246,18 +356,17 @@ void Machine::getNextInstruction() {
 
            Processor.setRegister(indexRegister, addBinary(dataCell1, dataCell2));
        }
-//       if(operation == '6'){
-//           int indexRegister = hexTodec((*programCounter)[index][1]);
-//           index++;
-//           int registerCell1 = hexTodec((*programCounter)[index][0]);
-//           int registerCell2 = hexTodec((*programCounter)[index][1]);
-//           string dataCell1 = Processor.getFromRegister(registerCell1);
-//           string dataCell2 = Processor.getFromRegister(registerCell2);
-//
-//           Processor.setRegister(indexRegister, addBinary(dataCell1, dataCell2));
-//       }
+       if(operation == '6'){
+           int indexRegister = hexTodec((*programCounter)[index][1]);
+           index++;
+           int registerCell1 = hexTodec((*programCounter)[index][0]);
+           int registerCell2 = hexTodec((*programCounter)[index][1]);
+           string dataCell1 = Processor.getFromRegister(registerCell1);
+           string dataCell2 = Processor.getFromRegister(registerCell2);
 
-//       13FF
+           Processor.setRegister(indexRegister, addTwoFloat(dataCell1, dataCell2));
+       }
+
        if(operation == 'B') {
 
             counter = index + 2;
@@ -284,6 +393,7 @@ void Machine::getNextInstruction() {
        }
 
        if(operation == 'C'){
+           return true;
            break;
       }
        if(index == 255){
@@ -292,7 +402,10 @@ void Machine::getNextInstruction() {
        else {
            index++;
        }
+    stop = true;
     }
+
+    return false;
 }
 
 void Machine::ReadFromFile(ifstream &inputFile) {
@@ -302,12 +415,30 @@ void Machine::ReadFromFile(ifstream &inputFile) {
     }
     else{
         string line;
-        int counter = 0;
+        int instructionIndex = 0, xCount = 0;
 
         while(getline(inputFile, line)){
 
-            Input.setInstruction(counter, line);
-            counter++;
+            string singleInstruction = "";
+            xCount = 0;
+
+            for (int i = 0; i < line.size(); i++) {
+
+                if(line[i] == 'X'){
+                    xCount++;
+
+                    if(xCount == 3){
+                        singleInstruction += toupper(line[i + 1]);
+                        singleInstruction += toupper(line[i + 2]);
+                    }
+                    else{
+                        singleInstruction += toupper(line[i + 1]);
+                    }
+                }
+            }
+            Input.setInstruction(instructionIndex, singleInstruction);
+
+            instructionIndex++;
 
         }
 

@@ -51,6 +51,7 @@ public:
     Instructions() : instruction(128){}
     void setInstruction(int, string);
     vector<string> &getInstruction();
+    string getCurrentInstruction(int index);
 
 };
 
@@ -63,11 +64,16 @@ private:
     Memory Storage;
     Instructions Input;
     vector <string> *programCounter;
+    static int index;
 public:
-    void getNextInstruction(); // increment 2
+    vector<string> *PC;
+    bool getNextInstruction(); // increment 2
     void ReadFromFile(ifstream &inputFile); // DONE
     void RunInstruction(); // current and next
+    string getIR();
+    void getPC();
     void DisplayMemory(); // DONE
+    void DisplayScreen();
     void DisplayRegister(); // DONE
 };
 
