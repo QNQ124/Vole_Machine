@@ -16,28 +16,34 @@ int main(){
 
 
     string filename;
-    // Ask the user for a filename to load the data
+    ifstream file;
+    bool isValid = false;
     cout << "Please enter a file name: ";
-    cin >> filename;
-    cin.ignore(); // Clear the input buffer
-
-    // Open the file for reading
-    ifstream file(filename, ios::in);
-
-    // Keep asking for the correct file name until a valid one is provided
-    while(true){
-        if(file.is_open()){ // If the file is successfully opened, break the loop
-            break;
-        }
-        else{ // If the file is not opened, ask for another filename
-            cout << "Error: Invalid file name please enter again: ";
-            cin >> filename;
-            continue;
-        }
-    }
-
     // Create a Machine object
     Machine vole_machine;
+// Read the new file and load the instructions into the machine
+
+    while(!isValid) {
+
+        // Keep asking for the correct file name until a valid one is provided
+        while (true) {
+            // Ask the user for a filename to load the data
+            cin >> filename;
+            cin.ignore(); // Clear the input buffer
+
+            // Open the file for reading
+            file.open(filename, ios::in);
+
+            if (file.is_open()) { // If the file is successfully opened, break the loop
+                break;
+            } else { // If the file is not opened, ask for another filename
+                cout << "Error: Invalid file name. Please enter again: ";
+            }
+        }
+
+        isValid = vole_machine.ReadFromFile(file);
+    }
+
     // Read data and instructions from the file
     vole_machine.ReadFromFile(file);
     // Run the instructions loaded into the machine
@@ -79,27 +85,50 @@ int main(){
         if (choice == "1"){ // Option to load a new file
 
             file.close(); // Close the previous file
-
-            // Ask the user for a new file name
             cout << "Please enter the new file name: ";
-            cin >> filename;
 
             // Keep asking for the correct file name until a valid one is provided
-            while(true){
-                if(file.is_open()){
-                    break; // Break if the new file is successfully opened
-                }
-                else{
-                    cout << "Error: Invalid file name please enter again: ";
-                    cin >> filename; // Prompt for a new filename if not valid
-                    continue;
+            while (true) {
+
+                cin >> filename;
+                cin.ignore(); // Clear the input buffer
+
+                // Open the file for reading
+                file.open(filename, ios::in);
+
+                if (file.is_open()) { // If the file is successfully opened, break the loop
+                    break;
+                } else { // If the file is not opened, ask for another filename
+                    cout << "Error: Invalid file name. Please enter again: ";
                 }
             }
 
             ifstream newFile(filename, ios::in); // Open the new file
 
             // Read the new file and load the instructions into the machine
-            vole_machine.ReadFromFile(newFile);
+            isValid = vole_machine.ReadFromFile(newFile);
+            while(!isValid){
+                file.close(); // Close the previous file
+                cout << "\nPlease enter the new file name: ";
+
+                // Keep asking for the correct file name until a valid one is provided
+                while (true) {
+
+                    cin >> filename;
+                    cin.ignore(); // Clear the input buffer
+
+                    // Open the file for reading
+                    file.open(filename, ios::in);
+
+                    if (file.is_open()) { // If the file is successfully opened, break the loop
+                        break;
+                    } else { // If the file is not opened, ask for another filename
+                        cout << "Error: Invalid file name. Please enter again: ";
+                    }
+                }
+                isValid = vole_machine.ReadFromFile(newFile);
+            }
+
             vole_machine.RunInstruction(); // Execute the instructions
         }
         else if (choice == "2"){ // Option to display the memory

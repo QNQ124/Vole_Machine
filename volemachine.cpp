@@ -7,7 +7,7 @@ using namespace std;
 int Machine::index = 0;
 
 // Convert a hexadecimal string to a binary string (8 bits)
-string hexToBin(const string& hexa) {
+string ALU::hexToBin(const string& hexa) {
     stringstream ss;
     ss << hex << hexa;
     unsigned n;
@@ -16,7 +16,11 @@ string hexToBin(const string& hexa) {
     return b.to_string();
 }
 
-string dec_to_hex(int num) {
+string ALU::dec_to_hex(int num) {
+    if (num == 0)
+    {
+        return "0";
+    }
     string result = "";
     string hex_chars = "0123456789ABCDEF";
     while (num >= 1) {
@@ -26,7 +30,8 @@ string dec_to_hex(int num) {
     return result;
 }
 
-int bin_to_dec(string num) {
+
+int ALU::bin_to_dec(string num) {
     int strlen = num.length();
     int result = 0;
     for (int i = 0; i < strlen; i++) {
@@ -35,8 +40,69 @@ int bin_to_dec(string num) {
     return result;
 }
 
-string decFract_to_hex(float fract)
+string ALU::fract(float fract) {
+
+    int sign = 1;
+    int expo = 0;
+    int mntsa = 0;
+    if(fract < 0)
+    {
+        sign = -1;
+    }
+
+    if(abs(fract) == 0.5 )
+    {
+        expo = 2;
+        mntsa = 0;
+    }
+    else if(abs(fract) == 0.25 )
+    {
+        expo = 1;
+        mntsa = 0;
+    }
+    else if(abs(fract) >= 0.5)
+    {
+        expo = 2;
+        string result = "";
+        for (int i = 0; i < 4; ++i) {
+            int floor = 0;
+            fract *=2;
+            floor = fract;
+            if(floor == 1)
+            {
+                result += '1';
+            }else { result += '0'; }
+        }
+        mntsa = ALU::bin_to_dec(result);
+
+
+    } else if (abs(fract) > 0.25)
+    {
+        expo = 1;
+        string result = "";
+        for (int i = 0; i < 4; ++i) {
+            int floor = 0;
+            fract *=2;
+            floor = fract;
+            if(floor == 1)
+            {
+                result += '1';
+            }else { result += '0'; }
+        }
+        mntsa = ALU::bin_to_dec(result);
+
+    }
+    if(sign != 1)
+    {
+        expo += 8;
+    }
+    return (ALU::dec_to_hex(expo) + ALU::dec_to_hex(mntsa));
+
+}
+
+string ALU::decFract_to_hex(float fract)
 {
+    fract = abs(fract);
     string result = "";
     for (int i = 0; i < 4; ++i) {
         int floor = 0;
@@ -47,13 +113,13 @@ string decFract_to_hex(float fract)
             result += '1';
         }else { result += '0'; }
     }
-    int decTohex = bin_to_dec(result);
+    int decTohex = ALU::bin_to_dec(result);
 
-    return dec_to_hex(decTohex);
+    return ALU::dec_to_hex(decTohex);
 }
 
 
-float binFract_to_dec(string fract)
+float ALU::binFract_to_dec(string fract)
 {
     int strlen = fract.length();
     float result = 0;
@@ -63,9 +129,10 @@ float binFract_to_dec(string fract)
     return result;
 }
 
-float floatTodecimal(string hexa1)
+
+float ALU::floatTodecimal(string hexa1)
 {
-    string bin = hexToBin(hexa1);
+    string bin = ALU::hexToBin(hexa1);
     char sign_c = bin[0];
     int sign = 1;
     if(sign_c == '1')
@@ -74,8 +141,8 @@ float floatTodecimal(string hexa1)
     string expo = bin.substr(1,3);
     string fraction = bin.substr(4,4);
 
-    int exp = bin_to_dec(expo);
-    float fract = binFract_to_dec(fraction);
+    int exp = ALU::bin_to_dec(expo);
+    float fract = ALU::binFract_to_dec(fraction);
 
     if(exp == 0)
     {
@@ -90,22 +157,36 @@ float floatTodecimal(string hexa1)
 }
 
 
-string addTwoFloat(string hexa1, string hexa2){ //
+string ALU::addTwoFloat(string hexa1, string hexa2){ //
 
     float sum;
-    sum = floatTodecimal(hexa1) + floatTodecimal(hexa2);
+    sum = ALU::floatTodecimal(hexa1) + ALU::floatTodecimal(hexa2);
     int expo = sum;
-    float fraction = (sum - expo)/expo;
-    expo = log2(expo) + 3;
+    float fraction;
+    if(expo != 0) {
+        fraction = (sum - expo) / expo;
+    } else{
+        fraction = sum; }
+
+    if(expo != 0)
+    {
+        expo = log2(expo) + 3;
+    }
+
     if(sum < 0)
     {expo + 8; }
-    string result = dec_to_hex(expo) + decFract_to_hex(fraction);
-    return result;
 
+    if(abs(sum) < 1 && abs(sum)  >= 0.25)
+    {
+        return fract(sum);
+    }
+
+    string result = ALU::dec_to_hex(expo) + ALU::decFract_to_hex(fraction);
+    return result;
 }
 
 // Function to convert hexadecimal to decimal
-int hexTodec(string num) {
+int ALU::hexTodec(string num) {
     int strlen = num.length();
     int result = 0;
     for (int i = 0; i < strlen; i++) {
@@ -118,7 +199,7 @@ int hexTodec(string num) {
     return result;
 }
 
-int hexTodec(char hexChar) {
+int ALU::hexTodec(char hexChar) {
     if (hexChar >= '0' && hexChar <= '9') {
         return hexChar - '0'; // Convert character '0'-'9' to integer 0-9
     } else if (hexChar >= 'A' && hexChar <= 'F') {
@@ -130,17 +211,89 @@ int hexTodec(char hexChar) {
 }
 
 // Convert a binary string to a hexadecimal string (8 bits)
-string binToHex(const string& binary) {
+string ALU::binToHex(const string& binary) {
+    if (binary == "00000000") {
+        return "00";
+    }
     stringstream ss;
     bitset<8> b(binary);  // 8-bit for limiting to 8 bits
     ss << hex << uppercase << b.to_ulong();
     return ss.str();
 }
 
+string ALU::bitwise_OR(string hexa1, string hexa2){
+
+    int hex1 = ALU::hexTodec(hexa1);
+    int hex2 = ALU::hexTodec(hexa2);
+
+    string result = ALU::dec_to_hex((hex1 | hex2));
+
+    // Ensure the result has at least two characters for proper padding
+    if (result.length() == 1) {
+        result = "0" + result;
+    } else if (result == "0") {
+        return "00";
+    }
+    return result;
+}
+
+string ALU::bitwise_AND(string hexa1, string hexa2){
+
+    int hex1 = ALU::hexTodec(hexa1);
+    int hex2 = ALU::hexTodec(hexa2);
+
+    string result = ALU::dec_to_hex((hex1 & hex2));
+
+    // Ensure the result has at least two characters for proper padding
+    if (result.length() == 1) {
+        result = "0" + result;
+    } else if (result == "0") {
+        return "00";
+    }
+
+    return result;
+}
+
+string ALU::bitwise_XOR(string hexa1, string hexa2){
+
+    int hex1 = ALU::hexTodec(hexa1);
+    int hex2 = ALU::hexTodec(hexa2);
+
+    string result = ALU::dec_to_hex((hex1 ^ hex2));
+
+    // Ensure the result has at least two characters for proper padding
+    if (result.length() == 1) {
+        result = "0" + result;
+    } else if (result == "0") {
+        return "00";
+    }
+
+    return result;
+}
+
+string ALU::bitwise_Rotate( string hexa, int steps) {
+
+
+    int hex = ALU::hexTodec(hexa);
+
+    int result = hex >> steps;
+
+    string nResult = ALU::dec_to_hex(result);
+
+    // Ensure the result has at least two characters for proper padding
+    if (nResult.length() == 1) {
+        nResult = "0" + nResult;
+    } else if (nResult == "0") {
+        return "00";
+    }
+
+    return nResult;
+}
+
 // Function to add two hexadecimal numbers by converting them to binary (only 8-bit result)
-string addBinary(const string& hexa1, const string& hexa2) {
-    string bin1 = hexToBin(hexa1);
-    string bin2 = hexToBin(hexa2);
+string ALU::addBinary(const string& hexa1, const string& hexa2) {
+    string bin1 = ALU::hexToBin(hexa1);
+    string bin2 = ALU::hexToBin(hexa2);
 
     string result = "";  // To store the result of addition
     int carry = 0;       // To store the carry value during addition
@@ -218,9 +371,15 @@ void Memory::setMemory(int index, string input) {
 }
 
 void Memory::print(){
-    for (const auto & i : Mem) {
-        cout << i << endl;
+    for (int i = 0; i < 256; i++){
+        if(i % 17 == 0){
+            cout << endl;
+        }
+        else{
+            cout << Mem[i] << " ";
+        }
     }
+    cout << endl;
 }
 
 vector<string> &Memory::getAllMemory() {
@@ -267,7 +426,7 @@ string Machine::getIR() {
 
 void Machine::getPC() {
 
-    cout << "0X" << dec_to_hex(index) << endl;
+    cout << "0X" << Operation.dec_to_hex(index) << endl;
 }
 
 void Machine::RunInstruction() {
@@ -296,6 +455,7 @@ void Machine::DisplayScreen(){
 
     cout << "The output screen from (3R00): " << Storage.getMemoryCell(0) << endl;
 }
+
 bool Machine::getNextInstruction() {
 
     string dataToRegister;
@@ -312,22 +472,22 @@ bool Machine::getNextInstruction() {
         char operation = (*programCounter)[index][0];
 
         if (operation == '1') {
-            int indexRegister = hexTodec((*programCounter)[index][1]);
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
             index++;
-            int indexOfMemory = hexTodec((*programCounter)[index]);
+            int indexOfMemory = Operation.hexTodec((*programCounter)[index]);
             Processor.setRegister(indexRegister, Storage.getMemoryCell(indexOfMemory));
         }
-        if (operation == '2') {
-            int indexRegister = hexTodec((*programCounter)[index][1]);
+        else if (operation == '2') {
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
             index++;
             dataToRegister = (*programCounter)[index];
             Processor.setRegister(indexRegister, dataToRegister);
         }
-        if (operation == '3') {
-            int indexRegister = hexTodec((*programCounter)[index][1]);
+        else if (operation == '3') {
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
             string dataFromRegister = Processor.getFromRegister(indexRegister);
             index++;
-            int indexOfMemory = hexTodec((*programCounter)[index]);
+            int indexOfMemory = Operation.hexTodec((*programCounter)[index]);
             if(indexOfMemory == 0) {
                 Storage.setMemory(indexOfMemory, dataFromRegister);
                 cout << "\n-----------------------\n";
@@ -337,46 +497,85 @@ bool Machine::getNextInstruction() {
             Storage.setMemory(indexOfMemory, dataFromRegister);
 
         }
-       if(operation == '4'){
+       else if(operation == '4'){
            index++;
-           int registerCell1 = hexTodec((*programCounter)[index][0]);
-           int registerCell2 = hexTodec((*programCounter)[index][1]);
+           int registerCell1 = Operation.hexTodec((*programCounter)[index][0]);
+           int registerCell2 = Operation.hexTodec((*programCounter)[index][1]);
            string dataFromCell1 = Processor.getFromRegister(registerCell1);
            Processor.setRegister(registerCell1, "00");
            Processor.setRegister(registerCell2, dataFromCell1);
 
        }
-       if(operation == '5'){
-           int indexRegister = hexTodec((*programCounter)[index][1]);
+       else if(operation == '5'){
+           int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
            index++;
-           int registerCell1 = hexTodec((*programCounter)[index][0]);
-           int registerCell2 = hexTodec((*programCounter)[index][1]);
+           int registerCell1 = Operation.hexTodec((*programCounter)[index][0]);
+           int registerCell2 = Operation.hexTodec((*programCounter)[index][1]);
            string dataCell1 = Processor.getFromRegister(registerCell1);
            string dataCell2 = Processor.getFromRegister(registerCell2);
 
-           Processor.setRegister(indexRegister, addBinary(dataCell1, dataCell2));
+           Processor.setRegister(indexRegister, Operation.addBinary(dataCell1, dataCell2));
        }
-       if(operation == '6'){
-           int indexRegister = hexTodec((*programCounter)[index][1]);
+       else if(operation == '6'){
+           int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
            index++;
-           int registerCell1 = hexTodec((*programCounter)[index][0]);
-           int registerCell2 = hexTodec((*programCounter)[index][1]);
+           int registerCell1 = Operation.hexTodec((*programCounter)[index][0]);
+           int registerCell2 = Operation.hexTodec((*programCounter)[index][1]);
            string dataCell1 = Processor.getFromRegister(registerCell1);
            string dataCell2 = Processor.getFromRegister(registerCell2);
 
-           Processor.setRegister(indexRegister, addTwoFloat(dataCell1, dataCell2));
+           Processor.setRegister(indexRegister, Operation.addTwoFloat(dataCell1, dataCell2));
        }
+       else if(operation == '7'){
+           int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
+           index++;
+           int registerCell1 = Operation.hexTodec((*programCounter)[index][0]);
+           int registerCell2 = Operation.hexTodec((*programCounter)[index][1]);
+           string dataCell1 = Processor.getFromRegister(registerCell1);
+           string dataCell2 = Processor.getFromRegister(registerCell2);
 
-       if(operation == 'B') {
+           Processor.setRegister(indexRegister, Operation.bitwise_OR(dataCell1, dataCell2));
 
-            counter = index + 2;
-           int indexRegister = hexTodec((*programCounter)[index][1]);
+       }
+        else if(operation == '8'){
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
+            index++;
+            int registerCell1 = Operation.hexTodec((*programCounter)[index][0]);
+            int registerCell2 = Operation.hexTodec((*programCounter)[index][1]);
+            string dataCell1 = Processor.getFromRegister(registerCell1);
+            string dataCell2 = Processor.getFromRegister(registerCell2);
+
+            Processor.setRegister(indexRegister, Operation.bitwise_AND(dataCell1, dataCell2));
+
+        }
+        else if(operation == '9'){
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
+            index++;
+            int registerCell1 = Operation.hexTodec((*programCounter)[index][0]);
+            int registerCell2 = Operation.hexTodec((*programCounter)[index][1]);
+            string dataCell1 = Processor.getFromRegister(registerCell1);
+            string dataCell2 = Processor.getFromRegister(registerCell2);
+
+            Processor.setRegister(indexRegister, Operation.bitwise_XOR(dataCell1, dataCell2));
+
+        }
+        else if(operation == 'A'){
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
+            string dataCell = Processor.getFromRegister(indexRegister);
+            index++;
+            int steps = Operation.hexTodec((*programCounter)[index][1]);
+            Processor.setRegister(indexRegister, Operation.bitwise_Rotate(dataCell, steps));
+        }
+       else if(operation == 'B') {
+
+           counter = index + 2;
+           int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
            string dataCell0 = Processor.getFromRegister(0);
            string dataCellR = Processor.getFromRegister(indexRegister);
 
            if (dataCell0 == dataCellR) {
                index++;
-               int indexOfMemory = hexTodec((*programCounter)[index]);
+               int indexOfMemory = Operation.hexTodec((*programCounter)[index]);
                if (indexOfMemory % 2 == 0) {
                    index = indexOfMemory;
                    programCounter = &Storage.getAllMemory();
@@ -391,8 +590,31 @@ bool Machine::getNextInstruction() {
             index += 2;
            }
        }
+        else if(operation == 'D'){
+            counter = index + 2;
+            int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
+            string dataCell0 = Processor.getFromRegister(0);
+            string dataCellR = Processor.getFromRegister(indexRegister);
 
-       if(operation == 'C'){
+            if (dataCell0 < dataCellR) {
+                index++;
+                int indexOfMemory = Operation.hexTodec((*programCounter)[index]);
+                if (indexOfMemory % 2 == 0) {
+                    index = indexOfMemory;
+                    programCounter = &Storage.getAllMemory();
+                    continue;
+                } else {
+                    index = indexOfMemory - 1;
+                    programCounter = &Storage.getAllMemory();
+                    continue;
+                }
+            }
+            else {
+                index += 2;
+            }
+        }
+
+       else if(operation == 'C'){
            return true;
            break;
       }
@@ -408,40 +630,35 @@ bool Machine::getNextInstruction() {
     return false;
 }
 
-void Machine::ReadFromFile(ifstream &inputFile) {
+bool Machine::ReadFromFile(ifstream &inputFile) {
 
     if(!inputFile.is_open()){
         cout << "Error: File doesn't exist" << endl;
     }
     else{
         string line;
-        int instructionIndex = 0, xCount = 0;
-
+        int xCount = 0;
+        int count = 0;
+        string s = "123456789ABCD";
         while(getline(inputFile, line)){
+            for (int i = 0; i < 14; ++i) {
+                if(line[0] != s[i]){
+                    count++;
+                    continue;
+                }
 
-            string singleInstruction = "";
-            xCount = 0;
-
-            for (int i = 0; i < line.size(); i++) {
-
-                if(line[i] == 'X'){
-                    xCount++;
-
-                    if(xCount == 3){
-                        singleInstruction += toupper(line[i + 1]);
-                        singleInstruction += toupper(line[i + 2]);
-                    }
-                    else{
-                        singleInstruction += toupper(line[i + 1]);
-                    }
+                if(count == 13){
+                    return false;
                 }
             }
-            Input.setInstruction(instructionIndex, singleInstruction);
+            transform(line.begin(), line.end(), line.begin(), ::toupper);
+            Input.setInstruction(xCount, line);
 
-            instructionIndex++;
+            xCount++;
 
         }
 
     }
+    return true;
 
 }
