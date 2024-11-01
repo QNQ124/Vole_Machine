@@ -8,7 +8,7 @@ Window {
     height: 600
     visible: true
     color: "black"
-    title: qsTr("Hello World")
+    title: qsTr("VOLE MACHINE SIMULATOR")
 
     // Variable to hold the input value
     property string inputValue: "0000"
@@ -262,7 +262,6 @@ Window {
 
             onClicked: {
                 // Call the action when the button is clicked
-                console.log("Button clicked!")
                 // Example actions
                 i = machine.setInstructions(inputValue)
                 send = true

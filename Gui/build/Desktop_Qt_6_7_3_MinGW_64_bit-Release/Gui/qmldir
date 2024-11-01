@@ -1,0 +1,5 @@
+module Gui
+typeinfo appGui.qmltypes
+prefer :/qt/qml/Gui/
+Main 1.0 Main.qml
+
