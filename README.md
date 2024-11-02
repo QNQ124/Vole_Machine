@@ -13,7 +13,7 @@ This provides a detailed explanation of the VOLE Machine  s code, which is struc
 
 2) After install Qt Framework:
 
-  Click on Open Project, enter the path where you placed the project, and select CMakeLists.txt. The project will then open.
+   Click on Open Project, enter the path where you placed the project, and select CMakeLists.txt. The project will then open.
 
 # Problems expected to be encountered
 1) You have not taken some of the steps mentioned. You must do them and read them carefully
