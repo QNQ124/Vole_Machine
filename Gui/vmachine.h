@@ -84,6 +84,7 @@ public:
     void setInstruction(int index, const QString &value);
     QVector<QString>& getInstruction();
     QString getCurrentInstruction(int index);
+    void ClearInstructions();
 };
 
 //////////////////////////////////////////////////////////////
@@ -126,6 +127,7 @@ public slots:
     QString displayPC();
     void clearMemory();
     void clearRegister();
+    void clearInstruct();
 };
 
 #endif // VOLE_MACHINE_VOLEMACHINE_H

@@ -394,6 +394,13 @@ QString Instructions::getCurrentInstruction(int index) {
     return instruction[(index / 2) - 1];
 }
 
+void Instructions::ClearInstructions(){
+
+    for (int k = 0; k < 128; ++k) {
+        instruction[k] = "0000";
+    }
+}
+
 //////////////////////////////////////////////////////////////////////
 
 QString Machine::getIR() {
@@ -612,6 +619,11 @@ int Machine::setInstructions(QString i){
     return 0;
 }
 
+void Machine::clearInstruct(){
+
+    input.ClearInstructions();
+}
+
 int Machine::run(){
 
     if(getNextInstruction()){
@@ -643,6 +655,7 @@ void Machine::clearMemory(){
     Counter = 0;
     index = 0;
     Count = 0;
+    clearInstruct();
 }
 
 void Machine::clearRegister(){
