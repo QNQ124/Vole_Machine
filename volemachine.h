@@ -83,7 +83,7 @@ public:
     void setInstruction(int, string);
     vector<string> &getInstruction();
     string getCurrentInstruction(int index);
-
+    void ClearInstruction();
 };
 
 
@@ -109,6 +109,7 @@ public:
     void DisplayRegister(); // DONE
     void ClearMemory();
     void ClearRegister();
+    void ClearInstruct();
 };
 
 

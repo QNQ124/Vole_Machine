@@ -421,6 +421,12 @@ string Instructions::getCurrentInstruction(int Index) {
     return instruction[(Index / 2) - 1];
 }
 
+void Instructions::ClearInstruction(){
+
+    for (int i = 0; i < 128; ++i) {
+        instruction[i] = "0000";
+    }
+}
 //////////////////////////////////////////////////////////////////////
 void Machine::DisplayMemory() {
 
@@ -674,6 +680,9 @@ bool Machine::ReadFromFile(ifstream &inputFile) {
     while(getline(inputFile, line)){
 
         if(!Operation.isValidInput(line)){
+
+            ClearInstruct();
+            index = 0;
             return false;
         }
 
@@ -685,4 +694,9 @@ bool Machine::ReadFromFile(ifstream &inputFile) {
     }
     return true;
 
+}
+
+void Machine::ClearInstruct() {
+
+    Input.ClearInstruction();
 }

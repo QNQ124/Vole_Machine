@@ -34,62 +34,47 @@
 
 using namespace std;
 
-int main(){
-
-    // Display the welcome message to the user
+int main() {
     cout << "|-------------- Ahlan ya User ya Habibi --------------|\n"
          << "|    In this Application we have a Vole machine       |\n"
-         << "|    simulator. You must input a file to read a data  |\n"
-         << "|    and Instructions from it and the program will    |\n"
-         << "|    Display the Memory and register to you.          |\n"
+         << "|    simulator. You must input a file to read data    |\n"
+         << "|    and instructions from, and the program will      |\n"
+         << "|    display the memory and registers to you.         |\n"
          << "|-----------------------------------------------------|\n\n";
 
-
     string filename;
-    ifstream file;
     bool isValid = false;
-    cout << "Please enter a file name: ";
-    // Create a Machine object
     Machine vole_machine;
-// Read the new file and load the instructions into the machine
+
+    cout << "Please enter a file name: ";
 
     while (!isValid) {
-        // Keep asking for the correct file name until a valid one is provided
-        while (true) {
 
-            cin >> filename;
-            cin.ignore(); // Clear the input buffer
+        cin >> filename;
+        cin.ignore(); // Clear the input buffer
 
-            // Open the file for reading
-            file.open(filename, ios::in);
+        // Open the file in a fresh ifstream instance
+        ifstream file(filename);
 
-            if (file.is_open()) { // If the file is successfully opened, break the loop
-                break;
-            } else { // If the file is not opened, ask for another filename
-                cout << "\nError: Invalid file name. Please enter again: ";
+        // Check if file opened successfully
+        if (file.is_open()) {
+            // Attempt to read from the file
+            isValid = vole_machine.ReadFromFile(file);
+            file.close();
+
+            if (!isValid) {
+                cout << "\nError: Invalid input. Please enter a valid file: ";
             }
-        }
-
-        // Attempt to read from the file
-        isValid = vole_machine.ReadFromFile(file);
-
-        // Close the file after reading
-        file.close();
-
-        if (!isValid) {
-            cout << "\nError: Invalid input. Please enter again: ";
+        } else {
+            cout << "\nError: Invalid file name. Please enter again: ";
         }
     }
 
-
-    // Read data and instructions from the file
-    vole_machine.ReadFromFile(file);
     // Run the instructions loaded into the machine
     vole_machine.RunInstruction();
 
     // Infinite loop to display the menu and let the user interact with the machine
-    while(true) {
-
+    while (true) {
         string choice;
         bool flag = false;
 
@@ -106,110 +91,72 @@ int main(){
         cout << "9) Exit                                 |\n";
         cout << "|---------------------------------------|\n";
 
-        // Ask the user for a choice
         cout << "Please enter your choice from the menu: ";
         getline(cin, choice); // Get the user's choice
 
-        // Validate the user's choice (make sure it's a number between 1 and 7)
-        while (true) {
-            if (choice == "1" || choice == "2" || choice == "3" || choice == "4" || choice == "5" ||
-                choice == "6" || choice == "7" || choice == "8" || choice == "9")
-                break; // Exit the loop if the choice is valid
-            else {
-                cout << "Please enter your choice from the menu: ";
-                getline(cin, choice); // Ask for input again until a valid choice is provided
-            }
+        // Validate the user's choice
+        while (choice < "1" || choice > "9") {
+            cout << "Please enter your choice from the menu: ";
+            getline(cin, choice);
         }
 
         // Handle user choices based on the input
-        if (choice == "1"){ // Option to load a new file
-
-            file.close(); // Close the previous file
+        if (choice == "1") { // Option to load a new file
+            vole_machine.ClearMemory(); // Clear memory for new file
+            isValid = false;
             cout << "\nPlease enter the new file name: ";
-            vole_machine.ClearMemory();
 
-            // Keep asking for the correct file name until a valid one is provided
-            while (true) {
+            while (!isValid) {
 
                 cin >> filename;
                 cin.ignore(); // Clear the input buffer
 
-                // Open the file for reading
-                file.open(filename, ios::in);
+                ifstream newFile(filename); // Open the new file
 
-                if (file.is_open()) { // If the file is successfully opened, break the loop
-                    break;
-                } else { // If the file is not opened, ask for another filename
+                if (newFile.is_open()) {
+                    isValid = vole_machine.ReadFromFile(newFile);
+                    newFile.close();
+
+                    if (!isValid) {
+                        cout << "\nError: Invalid input in file. Please enter a different file: ";
+                    }
+                } else {
                     cout << "\nError: Invalid file name. Please enter again: ";
                 }
             }
-
-            ifstream newFile(filename, ios::in); // Open the new file
-
-            // Read the new file and load the instructions into the machine
-            isValid = vole_machine.ReadFromFile(newFile);
-            while(!isValid){
-                file.close(); // Close the previous file
-                cout << "\nPlease enter the new file name: ";
-
-                // Keep asking for the correct file name until a valid one is provided
-                while (true) {
-
-                    cin >> filename;
-                    cin.ignore(); // Clear the input buffer
-
-                    // Open the file for reading
-                    file.open(filename, ios::in);
-
-                    if (file.is_open()) { // If the file is successfully opened, break the loop
-                        break;
-                    } else { // If the file is not opened, ask for another filename
-                        cout << "\nError: Invalid file name. Please enter again: ";
-                    }
-                }
-                isValid = vole_machine.ReadFromFile(newFile);
-                if(!isValid){
-                    cout << "\nError: Invalid input. Please enter again: ";
-                }
-            }
-
-            vole_machine.RunInstruction(); // Execute the instructions
+            vole_machine.RunInstruction();
         }
-        else if (choice == "2"){ // Option to display the memory
-            cout << "\n---------------\n";
-            vole_machine.DisplayMemory(); // Show the memory content
+        else if (choice == "2") { // Display Memory
+            vole_machine.DisplayMemory();
         }
-        else if (choice == "3"){ // Option to run the next instruction
-            flag = vole_machine.getNextInstruction(); // Get the next instruction
-
-            if(flag){ // If no more instructions, notify the user
-                cout << "\n-----------------------------\n";
-                cout << "The instructions are finished\n";
-                cout << "-----------------------------\n";
-                continue;
+        else if (choice == "3") { // Run next Instruction
+            flag = vole_machine.getNextInstruction();
+            if (flag) {
+                cout << "\n----------------------------------\n";
+                cout << "| The instructions are finished. |\n";
+                cout << "----------------------------------\n";
             }
         }
-        else if (choice == "4"){ // Option to display the register
-            cout << "\n---------------\n";
-            vole_machine.DisplayRegister(); // Show the register content
+        else if (choice == "4") { // Display Register
+            vole_machine.DisplayRegister();
         }
-
-        else if (choice == "5"){ // Option to display the Instruction Register (IR)
-            cout << "\n---------------\n";
-            cout << vole_machine.getIR() << endl; // Print the IR content
+        else if (choice == "5") { // Display Instruction Register (IR)
+            cout << "\n----\n";
+            cout << vole_machine.getIR() << endl;
+            cout << "----\n";
         }
-
-        else if (choice == "6"){ // Option to display the Program Counter (PC)
-            cout << "\n---------------\n";
-            vole_machine.getPC(); // Print the PC value
+        else if (choice == "6") { // Display Program Counter (PC)
+            cout << "\n----\n";
+            vole_machine.getPC();
+            cout << "----\n";
         }
-        else if(choice == "7"){
+        else if (choice == "7") { // Clear Memory
             vole_machine.ClearMemory();
         }
-        else if(choice == "8"){
+        else if (choice == "8") { // Clear Register
             vole_machine.ClearRegister();
         }
-        else{ // Exit the loop if the user chooses to exit
+        else { // Exit
             break;
         }
 
