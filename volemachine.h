@@ -17,7 +17,7 @@ public:
     Register() : registers(16, "00"){}
     void setRegister(int , string);
     string getFromRegister(int);
-    void Clear (int);
+    void Clear ();
     void print();
 
 };
@@ -51,6 +51,7 @@ public:
     string bitwise_OR(string hexa1, string hexa2);
 // Function to add two hexadecimal numbers by converting them to binary (only 8-bit result)
     string addBinary(const string& hexa1, const string& hexa2);
+    bool isValidInput(string &i);
 
 
 };
@@ -66,7 +67,6 @@ public:
     vector<string> &getAllMemory();
     string getMemoryCell(int);
     void ClearAll ();
-    void ClearCell(int);
     void print();
 
 };
@@ -107,6 +107,8 @@ public:
     void DisplayMemory(); // DONE
     void DisplayScreen();
     void DisplayRegister(); // DONE
+    void ClearMemory();
+    void ClearRegister();
 };
 
 

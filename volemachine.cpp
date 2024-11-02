@@ -159,10 +159,10 @@ float ALU::floatTodecimal(string hexa1)
 
 string ALU::addTwoFloat(string hexa1, string hexa2){ //
 
-    float sum;
+    double sum;
     sum = ALU::floatTodecimal(hexa1) + ALU::floatTodecimal(hexa2);
     int expo = sum;
-    float fraction;
+    double fraction;
     if(expo != 0) {
         fraction = (sum - expo) / expo;
     } else{
@@ -182,6 +182,15 @@ string ALU::addTwoFloat(string hexa1, string hexa2){ //
     }
 
     string result = ALU::dec_to_hex(expo) + ALU::decFract_to_hex(fraction);
+
+
+    // Ensure the result has at least two characters for proper padding
+    if (result.length() == 1) {
+        result = "0" + result;
+    } else if (result == "0") {
+        return "00";
+    }
+
     return result;
 }
 
@@ -323,6 +332,21 @@ string ALU::addBinary(const string& hexa1, const string& hexa2) {
     return binToHex(result);  // Convert the result back to hexadecimal
 }
 
+bool ALU::isValidInput(string &i) {
+    // Convert any alphabetic characters to uppercase
+    for (auto &c : i) {
+        if (isalpha(c)) {
+            c = toupper(c); // Convert to uppercase
+        }
+    }
+
+    // Define the regex pattern for the input
+    regex regex1(R"(^([1-9]|[A-D])[0-9A-F]{3}$)");
+
+    // Check if the input matches the regex
+    return regex_match(i, regex1);
+}
+
 
 //////////////////////////////////////////////////////////////////////
 void Register::setRegister(int index, string output) {
@@ -336,9 +360,11 @@ string Register::getFromRegister(int index) {
     return registers[index];
 }
 
-void Register::Clear(int index) {
+void Register::Clear() {
 
-    registers[index] = "00";
+    for (int i = 0; i < 16; ++i) {
+        registers[i] = "00";
+    }
 }
 
 void Register::print(){
@@ -353,18 +379,6 @@ void Memory::ClearAll() {
     fill(Mem.begin(), Mem.end(),"00");
 }
 
-void Memory::ClearCell(int index) {
-
-   if(index % 2 == 0){
-      Mem[index] = "00";
-      Mem[index + 1] = "00";
-   }
-   else{
-       Mem[index] = "00";
-       Mem[index - 1] = "00";
-   }
-}
-
 void Memory::setMemory(int index, string input) {
 
     Mem[index] = input;
@@ -372,12 +386,11 @@ void Memory::setMemory(int index, string input) {
 
 void Memory::print(){
     for (int i = 0; i < 256; i++){
-        if(i % 17 == 0){
+
+        if(i % 16 == 0){
             cout << endl;
         }
-        else{
-            cout << Mem[i] << " ";
-        }
+        cout << Mem[i] << " ";
     }
     cout << endl;
 }
@@ -424,6 +437,18 @@ string Machine::getIR() {
     return Input.getCurrentInstruction(index);
 }
 
+void Machine::ClearMemory(){
+
+    Storage.ClearAll();
+    index = 0;
+
+}
+void Machine::ClearRegister(){
+
+    Processor.Clear();
+    index = 0;
+
+}
 void Machine::getPC() {
 
     cout << "0X" << Operation.dec_to_hex(index) << endl;
@@ -459,6 +484,7 @@ void Machine::DisplayScreen(){
 bool Machine::getNextInstruction() {
 
     string dataToRegister;
+    char skip1, skip2;
 
     int counter = 0;
 
@@ -466,6 +492,16 @@ bool Machine::getNextInstruction() {
 
     programCounter = &Storage.getAllMemory();
 
+    skip1 = (*programCounter)[index][0];
+    skip2 = (*programCounter)[index][1];
+
+    if(skip1 == '0' && skip2 == '0'){
+
+        stop = true;
+        cout << "\n-------------------------\n";
+        cout << "Opcode not found. Halting";
+        cout << "\n-------------------------\n";
+    }
 
     while(!stop) {
 
@@ -632,31 +668,19 @@ bool Machine::getNextInstruction() {
 
 bool Machine::ReadFromFile(ifstream &inputFile) {
 
-    if(!inputFile.is_open()){
-        cout << "Error: File doesn't exist" << endl;
-    }
-    else{
-        string line;
-        int xCount = 0;
-        int count = 0;
-        string s = "123456789ABCD";
-        while(getline(inputFile, line)){
-            for (int i = 0; i < 14; ++i) {
-                if(line[0] != s[i]){
-                    count++;
-                    continue;
-                }
 
-                if(count == 13){
-                    return false;
-                }
-            }
-            transform(line.begin(), line.end(), line.begin(), ::toupper);
-            Input.setInstruction(xCount, line);
+    string line;
+    int xCount = 0;
+    while(getline(inputFile, line)){
 
-            xCount++;
-
+        if(!Operation.isValidInput(line)){
+            return false;
         }
+
+        transform(line.begin(), line.end(), line.begin(), ::toupper);
+        Input.setInstruction(xCount, line);
+
+        xCount++;
 
     }
     return true;

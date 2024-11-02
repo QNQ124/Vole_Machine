@@ -23,11 +23,10 @@ int main(){
     Machine vole_machine;
 // Read the new file and load the instructions into the machine
 
-    while(!isValid) {
-
+    while (!isValid) {
         // Keep asking for the correct file name until a valid one is provided
         while (true) {
-            // Ask the user for a filename to load the data
+
             cin >> filename;
             cin.ignore(); // Clear the input buffer
 
@@ -37,12 +36,21 @@ int main(){
             if (file.is_open()) { // If the file is successfully opened, break the loop
                 break;
             } else { // If the file is not opened, ask for another filename
-                cout << "Error: Invalid file name. Please enter again: ";
+                cout << "\nError: Invalid file name. Please enter again: ";
             }
         }
 
+        // Attempt to read from the file
         isValid = vole_machine.ReadFromFile(file);
+
+        // Close the file after reading
+        file.close();
+
+        if (!isValid) {
+            cout << "\nError: Invalid input. Please enter again: ";
+        }
     }
+
 
     // Read data and instructions from the file
     vole_machine.ReadFromFile(file);
@@ -63,7 +71,9 @@ int main(){
         cout << "4) Display Register                     |\n";
         cout << "5) Display Instruction Register(IR)     |\n";
         cout << "6) Display Program Counter(PC)          |\n";
-        cout << "7) Exit                                 |\n";
+        cout << "7) Clear Memory                         |\n";
+        cout << "8) Clear Register                       |\n";
+        cout << "9) Exit                                 |\n";
         cout << "|---------------------------------------|\n";
 
         // Ask the user for a choice
@@ -73,7 +83,7 @@ int main(){
         // Validate the user's choice (make sure it's a number between 1 and 7)
         while (true) {
             if (choice == "1" || choice == "2" || choice == "3" || choice == "4" || choice == "5" ||
-                choice == "6" || choice == "7")
+                choice == "6" || choice == "7" || choice == "8" || choice == "9")
                 break; // Exit the loop if the choice is valid
             else {
                 cout << "Please enter your choice from the menu: ";
@@ -85,7 +95,8 @@ int main(){
         if (choice == "1"){ // Option to load a new file
 
             file.close(); // Close the previous file
-            cout << "Please enter the new file name: ";
+            cout << "\nPlease enter the new file name: ";
+            vole_machine.ClearMemory();
 
             // Keep asking for the correct file name until a valid one is provided
             while (true) {
@@ -99,7 +110,7 @@ int main(){
                 if (file.is_open()) { // If the file is successfully opened, break the loop
                     break;
                 } else { // If the file is not opened, ask for another filename
-                    cout << "Error: Invalid file name. Please enter again: ";
+                    cout << "\nError: Invalid file name. Please enter again: ";
                 }
             }
 
@@ -123,10 +134,13 @@ int main(){
                     if (file.is_open()) { // If the file is successfully opened, break the loop
                         break;
                     } else { // If the file is not opened, ask for another filename
-                        cout << "Error: Invalid file name. Please enter again: ";
+                        cout << "\nError: Invalid file name. Please enter again: ";
                     }
                 }
                 isValid = vole_machine.ReadFromFile(newFile);
+                if(!isValid){
+                    cout << "\nError: Invalid input. Please enter again: ";
+                }
             }
 
             vole_machine.RunInstruction(); // Execute the instructions
@@ -159,7 +173,12 @@ int main(){
             cout << "\n---------------\n";
             vole_machine.getPC(); // Print the PC value
         }
-
+        else if(choice == "7"){
+            vole_machine.ClearMemory();
+        }
+        else if(choice == "8"){
+            vole_machine.ClearRegister();
+        }
         else{ // Exit the loop if the user chooses to exit
             break;
         }
