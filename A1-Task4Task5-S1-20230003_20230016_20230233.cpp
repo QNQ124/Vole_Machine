@@ -114,20 +114,25 @@ int main() {
                 ifstream newFile(filename); // Open the new file
 
                 if (newFile.is_open()) {
+                    vole_machine.ClearMemory();
                     isValid = vole_machine.ReadFromFile(newFile);
                     newFile.close();
-
                     if (!isValid) {
                         cout << "\nError: Invalid input in file. Please enter a different file: ";
+                        vole_machine.ClearMemory();
                     }
                 } else {
                     cout << "\nError: Invalid file name. Please enter again: ";
                 }
             }
+            ifstream newFILE(filename);
+            vole_machine.ReadFromFile(newFILE);
             vole_machine.RunInstruction();
         }
         else if (choice == "2") { // Display Memory
+            cout << "\n-------------------[ MEMORY ]-------------------";
             vole_machine.DisplayMemory();
+            cout << "-----------------------------------------------\n";
         }
         else if (choice == "3") { // Run next Instruction
             flag = vole_machine.getNextInstruction();
@@ -138,7 +143,9 @@ int main() {
             }
         }
         else if (choice == "4") { // Display Register
+            cout << "\n---\n";
             vole_machine.DisplayRegister();
+            cout << "---\n";
         }
         else if (choice == "5") { // Display Instruction Register (IR)
             cout << "\n----\n";
@@ -156,8 +163,14 @@ int main() {
         else if (choice == "8") { // Clear Register
             vole_machine.ClearRegister();
         }
-        else { // Exit
+        else if(choice == "9"){ // Exit
             break;
+        }
+        else{
+            cout << "\n------------------------------------------------\n";
+            cout << "| Wrong choice, Please enter your Choice again |\n";
+            cout << "------------------------------------------------\n";
+            continue;
         }
 
         cin.clear(); // Clear any input errors

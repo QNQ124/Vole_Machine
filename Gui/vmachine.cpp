@@ -190,6 +190,15 @@ QString ALU::addTwoFloat(const QString& hexa1, const QString& hexa2) {
     }
 
     QString result = ALU::decToHex(expo) + ALU::decFractToHex(fraction);
+
+
+    // Ensure the result has at least two characters for proper padding
+    if (result.length() == 1) {
+        result = "0" + result;
+    } else if (result == "0") {
+        return "00";
+    }
+
     return result;
 }
 
@@ -433,11 +442,9 @@ bool Machine::getNextInstruction() {
 
     while (!stop) {
         QChar Qoperation = (*programCounter)[index][0]; // Get the operation character
+
         if(Qoperation == '1' || Qoperation == '2' ||Qoperation == '3' ||Qoperation == '4' ||Qoperation == '5' ||Qoperation == '6' ||Qoperation == '7' ||Qoperation == '8' ||Qoperation == '9'){
             operation = Qoperation.toLatin1() - '0'; // Direct conversion
-        }
-        else{
-            operation = Qoperation.toLatin1();
         }
 
         if (operation == 1) {
@@ -554,6 +561,9 @@ bool Machine::getNextInstruction() {
         }
         else if (operation == 'C') {
             return true; // Exit condition
+        }
+        else{
+            index++;
         }
 
         if (index == 255) {

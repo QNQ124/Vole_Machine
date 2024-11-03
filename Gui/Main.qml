@@ -4,8 +4,10 @@ import QtQuick.Controls 2.15
 
 Window {
     id: window
-    width: 1080
-    height: 600
+    maximumWidth: 1080
+    maximumHeight: 600
+    minimumHeight: 600
+    minimumWidth: 1080
     visible: true
     color: "black"
     title: qsTr("VOLE MACHINE SIMULATOR")
@@ -181,7 +183,6 @@ Window {
             onClicked: {
                 halting = machine.run()
                 updateHexGrid2() // Refresh the hex grid2
-
                 Qt.callLater(function () {
                     irValue = machine.displayIR()
                     pcValue = machine.displayPC()
@@ -727,7 +728,7 @@ Window {
 
 /*##^##
 Designer {
-    D{i:0}D{i:1;invisible:true}D{i:17}
+    D{i:0}D{i:1;invisible:true}
 }
 ##^##*/
 

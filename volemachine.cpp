@@ -157,7 +157,7 @@ float ALU::floatTodecimal(string hexa1)
 }
 
 
-string ALU::addTwoFloat(string hexa1, string hexa2){ //
+string ALU::addTwoFloat(string hexa1, string hexa2){ 
 
     double sum;
     sum = ALU::floatTodecimal(hexa1) + ALU::floatTodecimal(hexa2);
@@ -528,14 +528,17 @@ bool Machine::getNextInstruction() {
         else if (operation == '3') {
             int indexRegister = Operation.hexTodec((*programCounter)[index][1]);
             string dataFromRegister = Processor.getFromRegister(indexRegister);
+            string newData = "0";
             index++;
             int indexOfMemory = Operation.hexTodec((*programCounter)[index]);
+
             if(indexOfMemory == 0) {
                 Storage.setMemory(indexOfMemory, dataFromRegister);
-                cout << "\n-----------------------\n";
+                cout << "\n---------------------------------\n";
                 DisplayScreen();
-                cout << "-------------------------\n";
+                cout << "---------------------------------\n";
             }
+
             Storage.setMemory(indexOfMemory, dataFromRegister);
 
         }
@@ -677,6 +680,7 @@ bool Machine::ReadFromFile(ifstream &inputFile) {
 
     string line;
     int xCount = 0;
+    ClearInstruct();
     while(getline(inputFile, line)){
 
         if(!Operation.isValidInput(line)){
