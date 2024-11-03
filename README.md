@@ -9,7 +9,7 @@ This provides a detailed explanation of the VOLE Machine  s code, which is struc
 # Steps to setup and run Gui
 1) install Qt Framework:
    
-   you must choose version Q 6.7.0 you can enter this link to know how install Qt [ https://youtu.be/wR_jXBUW11g?si=imG2NI6KZ3FYLBbO ] Until minute 9:30 but       when choose version. you must choose version Q 6.7.3
+   you must choose version Q 6.7.3 you can enter this link to know how install Qt [ https://youtu.be/wR_jXBUW11g?si=imG2NI6KZ3FYLBbO ] Until minute 9:30 but       when choose version. you must choose version Q 6.7.3
 
 2) After install Qt Framework:
 
