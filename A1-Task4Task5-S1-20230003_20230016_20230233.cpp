@@ -130,7 +130,7 @@ int main() {
             vole_machine.RunInstruction();
         }
         else if (choice == "2") { // Display Memory
-            cout << "\n-------------------[ MEMORY ]-------------------";
+            cout << "\n-------------------[ MEMORY ]------------------";
             vole_machine.DisplayMemory();
             cout << "-----------------------------------------------\n";
         }

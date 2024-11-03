@@ -501,7 +501,7 @@ bool Machine::getNextInstruction() {
     skip1 = (*programCounter)[index][0];
     skip2 = (*programCounter)[index][1];
 
-    if(skip1 == '0' && skip2 == '0'){
+    if(skip1 == '0' && skip2 == '0' && index != 0){
 
         stop = true;
         cout << "\n-------------------------\n";
@@ -662,6 +662,9 @@ bool Machine::getNextInstruction() {
        else if(operation == 'C'){
            return true;
            break;
+      }
+      else{
+           index++;
       }
        if(index == 255){
            index = counter;
