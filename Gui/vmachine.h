@@ -8,7 +8,7 @@
 #include <QTextStream>
 #include <QDebug>
 
-////////////////////////////////////////////////////////////////////
+
 
 class Register : public QObject {
     Q_OBJECT
@@ -23,7 +23,6 @@ public:
 
 };
 
-/////////////////////////////////////////////////////////////////////
 
 class ALU : public QObject {
     Q_OBJECT
@@ -58,7 +57,6 @@ public:
     QString addBinary(const QString &hexa1, const QString &hexa2);
 };
 
-/////////////////////////////////////////////////////////////////////
 
 class Memory : public QObject {
     Q_OBJECT
@@ -73,7 +71,6 @@ public:
     QString getMemoryCell(int index);
 };
 
-//////////////////////////////////////////////////////////////////////////
 
 class Instructions : public QObject {
     Q_OBJECT
@@ -89,7 +86,6 @@ public:
     void ClearInstructions();
 };
 
-//////////////////////////////////////////////////////////////
 
 class Machine : public QObject {
     Q_OBJECT

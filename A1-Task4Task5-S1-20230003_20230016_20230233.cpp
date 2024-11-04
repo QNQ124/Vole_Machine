@@ -314,7 +314,7 @@ bool ALU::isValidInput(string &i) {
 }
 
 
-//////////////////////////////////////////////////////////////////////
+
 void Register::setRegister(int index, string output) {
 
     if(output.size() == 1){
@@ -345,7 +345,7 @@ void Register::print(){
     }
 }
 
-//////////////////////////////////////////////////////////////////////
+
 void Memory::ClearAll() {
 
     fill(Mem.begin(), Mem.end(),"00");
@@ -384,7 +384,7 @@ string Memory::getMemoryCell(int index) {
     return Mem[index];
 }
 
-////////////////////////////////////////////////////////////////////
+
 void Instructions::setInstruction(int index, string input) {
 
     instruction[index] = input;
@@ -406,7 +406,7 @@ void Instructions::ClearInstruction(){
         instruction[i] = "0000";
     }
 }
-//////////////////////////////////////////////////////////////////////
+
 void Machine::DisplayMemory() {
 
     Storage.print();

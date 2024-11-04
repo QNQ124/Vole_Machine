@@ -379,7 +379,7 @@ bool ALU::isValidInput(QString &i) {
 
 
 
-//////////////////////////////////////////////////////////////////////
+
 
 void Register::setRegister(int index, QString data) {
 
@@ -393,7 +393,7 @@ QString Register::getFromRegister(int index) {
 }
 
 
-//////////////////////////////////////////////////////////////////////
+
 
 
 void Memory::setMemory(int indx, QString i) {
@@ -410,7 +410,7 @@ QString Memory::getMemoryCell(int indx) {
     return mem[indx];
 }
 
-//////////////////////////////////////////////////////////////////////
+
 
 void Instructions::setInstruction(int count, const QString &input) {
     instruction[count] = input;
@@ -434,7 +434,7 @@ void Instructions::ClearInstructions(){
     }
 }
 
-//////////////////////////////////////////////////////////////////////
+
 
 QString Machine::getIR() {
     return input.getCurrentInstruction(index);
