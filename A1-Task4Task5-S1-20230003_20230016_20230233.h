@@ -32,11 +32,11 @@ public:
     string hexToBin(const string& hexa);
     string dec_to_hex(int num);
     int bin_to_dec(string num);
-    string decFract_to_hex(float fract);
+    string decFract_to_hex(int intgr, float fract);
     float binFract_to_dec(string fract);
     float floatTodecimal(string hexa1);
     string addTwoFloat(string hexa1, string hexa2);
-
+    string dec_to_bin(int num);
 // Function to convert hexadecimal to decimal
     int hexTodec(string num);
 
@@ -44,7 +44,7 @@ public:
 
 // Convert a binary string to a hexadecimal string (8 bits)
     string binToHex(const string& binary);
-    string fract(float fract);
+    string decFract_to_bin(float fract);
     string bitwise_Rotate( string hexa, int steps);
     string bitwise_XOR(string hexa1, string hexa2);
     string bitwise_AND(string hexa1, string hexa2);

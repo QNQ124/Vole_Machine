@@ -16,6 +16,7 @@ string ALU::hexToBin(const string& hexa) {
     return b.to_string();
 }
 
+
 string ALU::dec_to_hex(int num) {
     if (num == 0)
     {
@@ -40,67 +41,8 @@ int ALU::bin_to_dec(string num) {
     return result;
 }
 
-string ALU::fract(float fract) {
 
-    int sign = 1;
-    int expo = 0;
-    int mntsa = 0;
-    if(fract < 0)
-    {
-        sign = -1;
-    }
-
-    if(abs(fract) == 0.5 )
-    {
-        expo = 2;
-        mntsa = 0;
-    }
-    else if(abs(fract) == 0.25 )
-    {
-        expo = 1;
-        mntsa = 0;
-    }
-    else if(abs(fract) >= 0.5)
-    {
-        expo = 2;
-        string result = "";
-        for (int i = 0; i < 4; ++i) {
-            int floor = 0;
-            fract *=2;
-            floor = fract;
-            if(floor == 1)
-            {
-                result += '1';
-            }else { result += '0'; }
-        }
-        mntsa = ALU::bin_to_dec(result);
-
-
-    } else if (abs(fract) > 0.25)
-    {
-        expo = 1;
-        string result = "";
-        for (int i = 0; i < 4; ++i) {
-            int floor = 0;
-            fract *=2;
-            floor = fract;
-            if(floor == 1)
-            {
-                result += '1';
-            }else { result += '0'; }
-        }
-        mntsa = ALU::bin_to_dec(result);
-
-    }
-    if(sign != 1)
-    {
-        expo += 8;
-    }
-    return (ALU::dec_to_hex(expo) + ALU::dec_to_hex(mntsa));
-
-}
-
-string ALU::decFract_to_hex(float fract)
+string ALU::decFract_to_bin(float fract)
 {
     fract = abs(fract);
     string result = "";
@@ -110,12 +52,59 @@ string ALU::decFract_to_hex(float fract)
         floor = fract;
         if(floor == 1)
         {
+            fract --;
             result += '1';
         }else { result += '0'; }
     }
-    int decTohex = ALU::bin_to_dec(result);
+    return result;
+}
 
-    return ALU::dec_to_hex(decTohex);
+string ALU::dec_to_bin(int num) {
+    string result = "";
+    while (num >= 1) {
+        result = to_string(num % 2) + result;
+        num /= 2;
+    }
+    if(result == "")
+    {
+        return "0";
+    }
+    return result;
+}
+
+
+string ALU::decFract_to_hex(int intgr,float fract)
+{
+    string bin_fract = ALU::decFract_to_bin(fract);
+    string bin_intgr = ALU::dec_to_bin(intgr);
+    int sign = (fract < 0) ? 1 : 0;
+    int expo_count = 0;
+    if(intgr == 0)
+    {
+        for (int i = 0; i < bin_fract.size(); ++i) {
+            if(bin_fract[i] == '0')
+            {
+                expo_count++;
+            } else if (bin_fract[i] == '1')
+            {
+                expo_count++;
+                break;
+            }
+        }
+        int expo = 4 - expo_count + (sign * 8);
+        string result = ALU::dec_to_bin(expo) + bin_fract.substr(expo_count,2) + "00";
+
+        return ALU::binToHex(result);
+    }
+    else
+    {
+        expo_count = bin_intgr.size() - 1;
+        int expo = 4 + expo_count + (sign * 8);
+        string result = ALU::dec_to_bin(expo) + bin_intgr.substr(1) +bin_fract;
+
+        return ALU::binToHex(result);
+    }
+
 }
 
 
@@ -143,46 +132,23 @@ float ALU::floatTodecimal(string hexa1)
 
     int exp = ALU::bin_to_dec(expo);
     float fract = ALU::binFract_to_dec(fraction);
+    fract+=1;
 
-    if(exp == 0)
-    {
-        return (sign * (pow(2,1-3)) * fract);
+    return (sign * (pow(2,exp-4)) * fract);
 
-    }else
-    {
-        fract+=1;
-        return (sign * (pow(2,exp-3)) * fract);
 
-    }
 }
 
 
-string ALU::addTwoFloat(string hexa1, string hexa2){ 
+string ALU::addTwoFloat(string hexa1, string hexa2){
 
     double sum;
     sum = ALU::floatTodecimal(hexa1) + ALU::floatTodecimal(hexa2);
-    int expo = sum;
+    int intgr = sum;
     double fraction;
-    if(expo != 0) {
-        fraction = (sum - expo) / expo;
-    } else{
-        fraction = sum; }
+    fraction = sum - intgr;
 
-    if(expo != 0)
-    {
-        expo = log2(expo) + 3;
-    }
-
-    if(sum < 0)
-    {expo + 8; }
-
-    if(abs(sum) < 1 && abs(sum)  >= 0.25)
-    {
-        return fract(sum);
-    }
-
-    string result = ALU::dec_to_hex(expo) + ALU::decFract_to_hex(fraction);
-
+    string result = ALU::decFract_to_hex(intgr,fraction);
 
     // Ensure the result has at least two characters for proper padding
     if (result.length() == 1) {

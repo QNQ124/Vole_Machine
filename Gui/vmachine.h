@@ -34,10 +34,12 @@ public:
     // Convert a hexadecimal string to a binary string (8 bits)
     QString hexToBin(const QString &hexa);
     QString decToHex(int num);
+    QString dec_to_bin(int num);
     int binToDec(const QString &num);
-    QString decFractToHex(float fract);
+    QString decFractToHex(int intgr, float fract);
     float binFractToDec(const QString &fract);
     float floatToDecimal(const QString &hexa1);
+    QString decFract_to_bin(float fract);
     QString addTwoFloat(const QString &hexa1, const QString &hexa2);
     QString fract(float fract);
     QString bitwise_Rotate(const QString& hexa, int steps);

@@ -107,23 +107,74 @@ QString ALU::fract(float fract) {
     return ALU::decToHex(expo) + ALU::decToHex(mntsa);
 }
 
-QString ALU::decFractToHex(float fract) {
-    fract = qFabs(fract); // Use qFabs for Qt compatibility
-    QString result = "";
+QString ALU::dec_to_bin(int num)
+{
+    QString result;
+
+    while (num >= 1) {
+        result.prepend(QString::number(num % 2));  // Use prepend to build the binary string from the least significant bit
+        num /= 2;
+    }
+
+    if (result.isEmpty()) {
+        return "0";
+    }
+
+    return result;
+}
+
+QString ALU::decFractToHex(int intgr, float fract)
+{
+    QString bin_fract = ALU::decFract_to_bin(fract);  // Assuming this returns a QString
+    QString bin_intgr = ALU::dec_to_bin(intgr);       // Assuming this returns a QString
+    int sign = (fract < 0) ? 1 : 0;
+    int expo_count = 0;
+
+    if(intgr == 0)
+    {
+        for (int i = 0; i < bin_fract.size(); ++i) {
+            if(bin_fract[i] == '0')
+            {
+                expo_count++;
+            } else if (bin_fract[i] == '1')
+            {
+                expo_count++;
+                break;
+            }
+        }
+        int expo = 4 - expo_count + (sign * 8);
+        QString result = ALU::dec_to_bin(expo) + bin_fract.mid(expo_count, 2) + "00";
+
+        return ALU::binToHex(result);  // Assuming binToHex also returns a QString
+    }
+    else
+    {
+        expo_count = bin_intgr.size() - 1;
+        int expo = 4 + expo_count + (sign * 8);
+        QString result = ALU::dec_to_bin(expo) + bin_intgr.mid(1) + bin_fract;
+
+        return ALU::binToHex(result);
+    }
+}
+
+QString ALU::decFract_to_bin(float fract)
+{
+    fract = std::abs(fract);  // Using std::abs for clarity
+    QString result;
 
     for (int i = 0; i < 4; ++i) {
         fract *= 2;
-        int floor = static_cast<int>(fract); // Convert float to int
+        int floor = static_cast<int>(fract);  // Casting to int to get the floor value
+
         if (floor == 1) {
+            fract -= floor;
             result += '1';
         } else {
             result += '0';
         }
-        fract -= floor; // Keep the fractional part for the next iteration
     }
 
-    int decToHex = ALU::binToDec(result); // Convert binary string to decimal
-    return ALU::decToHex(decToHex); // Convert decimal to hexadecimal
+    return result;
 }
 
 
@@ -140,68 +191,41 @@ float ALU::binFractToDec(const QString& fract) {
 }
 
 
-float ALU::floatToDecimal(const QString& hexa1) {
-    QString bin = ALU::hexToBin(hexa1);
+float ALU::floatToDecimal(const QString& hexa1)
+{
+    QString bin = ALU::hexToBin(hexa1);  // Assuming hexToBin returns a QString
     QChar sign_c = bin[0];
-    int sign = 1;
-    if (sign_c == '1') {
-        sign = -1;
-    }
+    int sign = (sign_c == '1') ? -1 : 1;
 
     QString expo = bin.mid(1, 3);
     QString fraction = bin.mid(4, 4);
 
-    int exp = ALU::binToDec(expo);
-    float fract = ALU::binFractToDec(fraction);
+    int exp = ALU::binToDec(expo);          // Assuming bin_to_dec accepts a QString and returns an int
+    float fract = ALU::binFractToDec(fraction); // Assuming binFract_to_dec accepts a QString and returns a float
+    fract += 1;
 
-    if (exp == 0) {
-        return (sign * (qPow(2, 1 - 3)) * fract);
-    } else {
-        fract += 1;
-        return (sign * (qPow(2, exp - 3)) * fract);
-    }
+    return sign * std::pow(2, exp - 4) * fract;
 }
 
 
 
-QString ALU::addTwoFloat(const QString& hexa1, const QString& hexa2) {
-    float sum;
-    sum = ALU::floatToDecimal(hexa1) + ALU::floatToDecimal(hexa2);
+QString ALU::addTwoFloat(const QString& hexa1, const QString& hexa2)
+{
+    double sum = ALU::floatToDecimal(hexa1) + ALU::floatToDecimal(hexa2);
+    int intgr = static_cast<int>(sum);
+    double fraction = sum - intgr;
 
-    int expo = static_cast<int>(sum);
-    float fraction;
-
-    if (expo != 0) {
-        fraction = (sum - expo) / expo;
-    } else {
-        fraction = sum;
-    }
-
-    if (expo != 0) {
-        expo = floor(log2(expo)) + 3;  // Use qLog2 for logarithm base 2
-    }
-
-    if (sum < 0) {
-        expo += 8;  // Ensure to use += instead of just + to update the value
-    }
-
-    if (qAbs(sum) < 1 && qAbs(sum) >= 0.25) {
-        return ALU::fract(sum);  // Assuming fract returns QString
-    }
-
-    QString result = ALU::decToHex(expo) + ALU::decFractToHex(fraction);
-
+    QString result = ALU::decFractToHex(intgr, fraction);  // Assuming decFract_to_hex returns a QString
 
     // Ensure the result has at least two characters for proper padding
     if (result.length() == 1) {
-        result = "0" + result;
+        result.prepend("0");
     } else if (result == "0") {
         return "00";
     }
 
     return result;
 }
-
 
 // Convert hexadecimal string to decimal
 int ALU::hexToDec(const QString& num) {
