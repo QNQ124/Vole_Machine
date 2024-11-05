@@ -1,0 +1,10 @@
+-I
+D:/Gui/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug
+-I
+C:/Qt/6.7.3/mingw_64/qml
+--resource
+D:/Gui/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qt/rcc/qmake_Gui.qrc
+--resource
+D:/Gui/build/Desktop_Qt_6_7_3_MinGW_64_bit-Debug/.qt/rcc/appGui_raw_qml_0.qrc
+--module
+Gui

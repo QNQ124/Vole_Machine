@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="/qt/qml/Gui">D:/Gui/build/Desktop_Qt_6_7_3_MinGW_64_bit-MinSizeRel/Gui</file>
+
+  </qresource>
+</RCC>
