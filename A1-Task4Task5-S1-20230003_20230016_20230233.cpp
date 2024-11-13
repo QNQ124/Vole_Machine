@@ -356,7 +356,7 @@ void Memory::setMemory(int index, string input) {
     if(input.size() == 1){
         Mem[index] = "";
         Mem[index] += "0";
-        Mem[index] = input;
+        Mem[index] += input;
     }
     else {
         Mem[index] = input;
